@@ -131,7 +131,6 @@ def load_books():
         return books
     except json.JSONDecodeError:
         print(f"\nCouldnt load {BOOKS_JSON_FILE}! Starting with empty collection.")
-        input("\nPress Enter to continue...")
         return []
     
         
@@ -149,7 +148,6 @@ def save_books(book_list):
             json.dump(book_list , json_books,  indent=4)
     except:
         print(f"\nError saving books to {BOOKS_JSON_FILE}!")
-        input("\nPress Enter to return to menu...")
 
 
 def write_to_csv(books_details, file_name):
@@ -170,7 +168,6 @@ def write_to_csv(books_details, file_name):
             writer.writerow(books_details)
     except:
         print(f"\nError writing to {file_name}!")
-        input("\nPress Enter to return to menu...")
 
 
 # -----------------------------
@@ -217,7 +214,6 @@ def add_book(book_list):
 
     save_books(book_list)
     print("\nBook added successfully!")
-    input("\nPress Enter to return to menu...")
 
 def search_book(book_list):
     """
@@ -229,7 +225,6 @@ def search_book(book_list):
    
     if not book_list: 
         print("\nThere are no books yet!")
-        input("\nPress Enter to return to menu...")
         return
 
     term = get_valid_input("\nEnter book title to search: ")
@@ -237,10 +232,8 @@ def search_book(book_list):
         if book["title"].lower() == term.lower():
             print("\nThe Book you are looking for:")
             display_book(book) 
-            input("\nPress Enter to return to menu...")
             return
     print("\nBook not found")
-    input("\nPress Enter to return to menu...")
 
 
 
@@ -254,7 +247,6 @@ def sort_books(book_list):
    
     if not book_list: 
         print("\nThere are no books yet!")
-        input("\nPress Enter to return to menu...")
         return
     
     book_list.sort(key = lambda book: book["title"] )
@@ -262,7 +254,6 @@ def sort_books(book_list):
     print("\nBooks sorted by title:")
     display_all_books(book_list)  
 
-    input("\nPress Enter to return to menu...")
     
 def find_oldest_book(book_list):
     """
@@ -273,7 +264,6 @@ def find_oldest_book(book_list):
     """
     if not book_list: 
         print("\nThere are no books yet!")
-        input("\nPress Enter to return to menu...")
         return
     
     book = min(book_list, key= lambda book: int(book["year"]))
@@ -281,7 +271,6 @@ def find_oldest_book(book_list):
 
     print("\nThe Oldest Book:")
     display_book(book)
-    input("\nPress Enter to return to menu...")
    
 
 
@@ -295,7 +284,6 @@ def find_newest_book(book_list):
     """
     if not book_list: 
         print("\nThere are no books yet!")
-        input("\nPress Enter to return to menu...")
         return
     
     book = max(book_list, key= lambda book: int(book["year"]))
@@ -303,7 +291,6 @@ def find_newest_book(book_list):
 
     print("\nThe Newest Book:")
     display_book(book)
-    input("\nPress Enter to return to menu...")
 
 
 def export_titles_csv(book_list):
@@ -316,7 +303,6 @@ def export_titles_csv(book_list):
     
     if not book_list:
         print("\nThere are no books to export!")
-        input("\nPress Enter to return to menu...")
         return
     
    
@@ -324,7 +310,6 @@ def export_titles_csv(book_list):
 
     write_to_csv(titles, TITLES_CSV_FILE)
     print("\nBook titles exported to titles.csv successfully!")
-    input("\nPress Enter to return to menu...")
 
 def export_years_csv(book_list):
     """
@@ -336,7 +321,6 @@ def export_years_csv(book_list):
     
     if not book_list:
         print("\nThere are no books to export!")
-        input("\nPress Enter to return to menu...")
         return
     
     
@@ -344,7 +328,6 @@ def export_years_csv(book_list):
     
     write_to_csv(years, YEARS_CSV_FILE)
     print("\nPublication years exported to years.csv successfully!")
-    input("\nPress Enter to return to menu...")
 
 def count_books_by_author(book_list):
     """
@@ -352,7 +335,6 @@ def count_books_by_author(book_list):
     """
     if not book_list:
         print("\nThere are no books yet!")
-        input("\nPress Enter to return to menu...")
         return
     
     author_name = get_valid_input("\nEnter author name: ")
@@ -364,11 +346,9 @@ def count_books_by_author(book_list):
     
     if count == 0:
         print(f"\nNo books found by {author_name}")
-        input("\nPress Enter to return to menu...")
 
     else:
         print(f"\nNumber of books by {author_name}: {count}")
-        input("\nPress Enter to return to menu...")
 
 # -----------------------------
 # MAIN PROGRAM
@@ -387,27 +367,35 @@ def main():
 
         if choice == "1":
             add_book(book_list)
-
+            input("\nPress Enter to return to menu...")
+            
         elif choice == "2":
             search_book(book_list)
-
+            input("\nPress Enter to return to menu...")
+            
         elif choice == "3":
             sort_books(book_list)
+            input("\nPress Enter to return to menu...")
 
         elif choice == "4":
             find_oldest_book(book_list)
+            input("\nPress Enter to return to menu...")
 
         elif choice == "5":
             find_newest_book(book_list)
+            input("\nPress Enter to return to menu...")
 
         elif choice == "6":
             export_titles_csv(book_list)
+            input("\nPress Enter to return to menu...")
 
         elif choice == "7":
             export_years_csv(book_list)
+            input("\nPress Enter to return to menu...")
 
         elif choice == "8":
             count_books_by_author(book_list)
+            input("\nPress Enter to return to menu...")
 
         elif choice == "9":
             print("\nGoodbye!")
