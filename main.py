@@ -19,18 +19,18 @@ Date: 25-05-2026
 Version: 1.0
 """
 
-#-------------------------------
+#=========================
 # IMPORTS
-#-------------------------------
+#=========================
 
 import json
 import csv
 import os
 
 
-#-------------------------------
+#=========================
 # CONSTANTS
-#-------------------------------
+#=========================
 
 MENU = """
 ===== BOOK MANAGEMENT SYSTEM =====
@@ -49,9 +49,9 @@ BOOKS_JSON_FILE = "books.json"
 TITLES_CSV_FILE = "titles.csv"
 YEARS_CSV_FILE = "years.csv"
 
-#-----------------------------
+#=========================
 # HELPER FUNCTIONS
-#-----------------------------
+#=========================
 
 def get_valid_input(prompt, input_type=str, error_message="Invalid input! Please try again."):
     """
@@ -110,9 +110,9 @@ def display_all_books(book_list):
         print(f"{i}. {book['title']} by {book['author']} ({book['year']})")
 
 
-#-----------------------------
+#=========================
 # DATA MANAGEMENT
-#-----------------------------
+#=========================
 
 def load_books():
     """
@@ -130,7 +130,7 @@ def load_books():
             books = json.load(file)
         return books
     except json.JSONDecodeError:
-        print(f"\nCouldnt load {BOOKS_JSON_FILE}! Starting with empty collection.")
+        print(f"\nCouldn't load {BOOKS_JSON_FILE}! Starting with empty collection.")
         return []
     
         
@@ -170,9 +170,9 @@ def write_to_csv(books_details, file_name):
         print(f"\nError writing to {file_name}!")
 
 
-# -----------------------------
+# =========================
 # MENU SYSTEM
-# -----------------------------
+# =========================
 
 def get_user_choice():
     """
@@ -185,9 +185,9 @@ def get_user_choice():
     return choice
 
 
-# -----------------------------
+# =========================
 # CORE FEATURES
-# -----------------------------
+# =========================
 
 def add_book(book_list):
     """
@@ -350,9 +350,9 @@ def count_books_by_author(book_list):
     else:
         print(f"\nNumber of books by {author_name}: {count}")
 
-# -----------------------------
+# =========================
 # MAIN PROGRAM
-# -----------------------------
+# =========================
 
 def main():
     """
@@ -405,9 +405,9 @@ def main():
             print("\nInvalid choice. Please try again.")
 
 
-# -----------------------------
+# =========================
 # PROGRAM ENTRY POINT
-# -----------------------------
+# =========================
 
 if __name__ == "__main__":
     main()
