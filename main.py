@@ -130,7 +130,7 @@ def load_books():
             books = json.load(file)
         return books
     except json.JSONDecodeError:
-        print(f"\nCouldn't load {BOOKS_JSON_FILE}! Starting with empty collection.")
+        print(f"\nCouldn't load {BOOKS_JSON_FILE}! Starting with an empty collection.")
         return []
     
         

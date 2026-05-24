@@ -220,3 +220,323 @@ class TestGetValidInput(unittest.TestCase):
 
 
 
+
+# ============================================================
+# UT08, UT09: search_book() Tests
+# ============================================================
+
+class TestSearchBook(unittest.TestCase):
+    """Tests for searching books by title"""
+
+    def setUp(self):
+        self.books = [
+            {"title": "1984", "author": "George Orwell", "genre": "Dystopian", 
+             "year": 1949, "price": 9.99},
+            {"title": "Animal Farm", "author": "George Orwell", "genre": "Satire", 
+             "year": 1945, "price": 7.99}
+        ]
+
+    @patch('main.get_valid_input', return_value="1984")
+    def test_UT08_search_book_found(self, mock_input):
+        """UT08: Search for existing book - details displayed"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.search_book(self.books)
+        
+        output = fake_out.getvalue()
+        self.assertIn("1984", output)
+        self.assertIn("George Orwell", output)
+        self.assertIn("Dystopian", output)
+        self.assertIn("1949", output)
+        self.assertIn("9.99", output)
+
+    @patch('main.get_valid_input', return_value="1984")
+    def test_UT08b_case_insensitive_search(self, mock_input):
+        """UT08: Search should be case-insensitive"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.search_book(self.books)
+        
+        output = fake_out.getvalue()
+        self.assertIn("1984", output)
+
+    @patch('main.get_valid_input', return_value="Nonexistent Book")
+    def test_UT09_search_book_not_found(self, mock_input):
+        """UT09: Search for non-existent book - 'not found' message displayed"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.search_book(self.books)
+        
+        output = fake_out.getvalue()
+        self.assertIn("Book not found", output)
+
+    def test_UT09b_search_empty_collection(self):
+        """UT09: Search in empty collection shows appropriate message"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.search_book([])
+        
+        output = fake_out.getvalue()
+        self.assertIn("There are no books yet!", output)
+
+
+# ============================================================
+# UT10: sort_books() Test
+# ============================================================
+
+class TestSortBooks(unittest.TestCase):
+    """Tests for sorting books alphabetically"""
+
+    def setUp(self):
+        self.books = [
+            {"title": "Zebra", "author": "X", "genre": "G", "year": 2000, "price": 1.0},
+            {"title": "Apple", "author": "Y", "genre": "G", "year": 2000, "price": 1.0},
+            {"title": "Mango", "author": "Z", "genre": "G", "year": 2000, "price": 1.0}
+        ]
+
+    @patch('main.save_books')
+    def test_UT10_sort_alphabetically(self, mock_save):
+        """UT10: Sort multiple books - alphabetical order by title"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.sort_books(self.books)
+        
+        output = fake_out.getvalue()
+        
+        # Check list is sorted
+        self.assertEqual(self.books[0]['title'], "Apple")
+        self.assertEqual(self.books[1]['title'], "Mango")
+        self.assertEqual(self.books[2]['title'], "Zebra")
+        
+        # Check display output
+        self.assertIn("Apple", output)
+        self.assertIn("Mango", output)
+        self.assertIn("Zebra", output)
+        
+        # Check save was called
+        mock_save.assert_called_once_with(self.books)
+
+    def test_UT10b_sort_empty_collection(self):
+        """UT10: Sort empty collection shows appropriate message"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.sort_books([])
+        
+        output = fake_out.getvalue()
+        self.assertIn("There are no books yet!", output)
+
+
+# ============================================================
+# UT11: find_oldest_book() Test
+# ============================================================
+
+class TestFindOldestBook(unittest.TestCase):
+    """Tests for finding the oldest book"""
+
+    def setUp(self):
+        self.books = [
+            {"title": "Book A", "author": "A", "genre": "G", "year": 2000, "price": 5.0},
+            {"title": "Book B", "author": "B", "genre": "G", "year": 1950, "price": 5.0},
+            {"title": "Book C", "author": "C", "genre": "G", "year": 2020, "price": 5.0}
+        ]
+
+    def test_UT11_find_oldest_book(self):
+        """UT11: Find oldest book - earliest year displayed"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.find_oldest_book(self.books)
+        
+        output = fake_out.getvalue()
+        self.assertIn("Book B", output)
+        self.assertIn("1950", output)
+
+    def test_UT11b_single_book(self):
+        """UT11: Single book collection - that book is the oldest"""
+        single_book = [{"title": "Only", "author": "X", "genre": "G", "year": 2000, "price": 5.0}]
+        
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.find_oldest_book(single_book)
+        
+        output = fake_out.getvalue()
+        self.assertIn("Only", output)
+
+    def test_UT11c_empty_collection(self):
+        """UT11: Empty collection shows appropriate message"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.find_oldest_book([])
+        
+        output = fake_out.getvalue()
+        self.assertIn("There are no books yet!", output)
+
+
+# ============================================================
+# UT12: find_newest_book() Test
+# ============================================================
+
+class TestFindNewestBook(unittest.TestCase):
+    """Tests for finding the newest book"""
+
+    def setUp(self):
+        self.books = [
+            {"title": "Book A", "author": "A", "genre": "G", "year": 2000, "price": 5.0},
+            {"title": "Book B", "author": "B", "genre": "G", "year": 1950, "price": 5.0},
+            {"title": "Book C", "author": "C", "genre": "G", "year": 2020, "price": 5.0}
+        ]
+
+    def test_UT12_find_newest_book(self):
+        """UT12: Find newest book - latest year displayed"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.find_newest_book(self.books)
+        
+        output = fake_out.getvalue()
+        self.assertIn("Book C", output)
+        self.assertIn("2020", output)
+
+    def test_UT12b_single_book(self):
+        """UT12: Single book collection - that book is the newest"""
+        single_book = [{"title": "Only", "author": "X", "genre": "G", "year": 2000, "price": 5.0}]
+        
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.find_newest_book(single_book)
+        
+        output = fake_out.getvalue()
+        self.assertIn("Only", output)
+
+    def test_UT12c_empty_collection(self):
+        """UT12: Empty collection shows appropriate message"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.find_newest_book([])
+        
+        output = fake_out.getvalue()
+        self.assertIn("There are no books yet!", output)
+
+
+# ============================================================
+# UT13, UT14: count_books_by_author() Tests
+# ============================================================
+
+class TestCountBooksByAuthor(unittest.TestCase):
+    """Tests for counting books by author"""
+
+    def setUp(self):
+        self.books = [
+            {"title": "1984", "author": "George Orwell", "genre": "Dystopian", 
+             "year": 1949, "price": 9.99},
+            {"title": "Animal Farm", "author": "George Orwell", "genre": "Satire", 
+             "year": 1945, "price": 7.99},
+            {"title": "Brave New World", "author": "Aldous Huxley", "genre": "Dystopian", 
+             "year": 1932, "price": 8.99}
+        ]
+
+    @patch('main.get_valid_input', return_value="George Orwell")
+    def test_UT13_count_existing_author(self, mock_input):
+        """UT13: Author with multiple books - correct count displayed"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.count_books_by_author(self.books)
+        
+        output = fake_out.getvalue()
+        self.assertIn("2", output)
+        self.assertIn("George Orwell", output)
+
+    @patch('main.get_valid_input', return_value="Aldous Huxley")
+    def test_UT13b_count_single_book_author(self, mock_input):
+        """UT13: Author with one book - count of 1 displayed"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.count_books_by_author(self.books)
+        
+        output = fake_out.getvalue()
+        self.assertIn("1", output)
+        self.assertIn("Aldous Huxley", output)
+
+    @patch('main.get_valid_input', return_value="Unknown Author")
+    def test_UT14_count_no_author(self, mock_input):
+        """UT14: Author with no books - zero/not found message displayed"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.count_books_by_author(self.books)
+        
+        output = fake_out.getvalue()
+        self.assertIn("No books found", output)
+
+    @patch('main.get_valid_input', return_value="george orwell")
+    def test_UT14b_case_insensitive_search(self, mock_input):
+        """UT14: Author search should be case-insensitive"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.count_books_by_author(self.books)
+        
+        output = fake_out.getvalue()
+        self.assertIn("2", output)
+
+    def test_UT14c_empty_collection(self):
+        """UT14: Empty collection shows appropriate message"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.count_books_by_author([])
+        
+        output = fake_out.getvalue()
+        self.assertIn("There are no books yet!", output)
+
+
+# ============================================================
+# UT15: export_titles_csv() Test
+# ============================================================
+
+class TestExportTitlesCSV(unittest.TestCase):
+    """Tests for exporting book titles to CSV"""
+
+    def setUp(self):
+        self.books = [
+            {"title": "Book A", "year": 2000},
+            {"title": "Book B", "year": 2005},
+            {"title": "Book C", "year": 2010}
+        ]
+
+    @patch('main.write_to_csv')
+    def test_UT15_export_titles(self, mock_write):
+        """UT15: Export titles - write_to_csv called with correct titles"""
+        main.export_titles_csv(self.books)
+        
+        expected_titles = ["Book A", "Book B", "Book C"]
+        mock_write.assert_called_once_with(expected_titles, main.TITLES_CSV_FILE)
+
+    @patch('main.write_to_csv')
+    def test_UT15b_empty_list(self, mock_write):
+        """UT15: Empty list - no export, appropriate message"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.export_titles_csv([])
+        
+        output = fake_out.getvalue()
+        self.assertIn("There are no books to export!", output)
+        mock_write.assert_not_called()
+
+
+# ============================================================
+# UT16: export_years_csv() Test
+# ============================================================
+
+class TestExportYearsCSV(unittest.TestCase):
+    """Tests for exporting publication years to CSV"""
+
+    def setUp(self):
+        self.books = [
+            {"title": "Book A", "year": 2000},
+            {"title": "Book B", "year": 2005},
+            {"title": "Book C", "year": 2010}
+        ]
+
+    @patch('main.write_to_csv')
+    def test_UT16_export_years(self, mock_write):
+        """UT16: Export years - write_to_csv called with correct years"""
+        main.export_years_csv(self.books)
+        
+        expected_years = [2000, 2005, 2010]
+        mock_write.assert_called_once_with(expected_years, main.YEARS_CSV_FILE)
+
+    @patch('main.write_to_csv')
+    def test_UT16b_empty_list(self, mock_write):
+        """UT16: Empty list - no export, appropriate message"""
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            main.export_years_csv([])
+        
+        output = fake_out.getvalue()
+        self.assertIn("There are no books to export!", output)
+        mock_write.assert_not_called()
+
+
+# ============================================================
+# Run the tests
+# ============================================================
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
