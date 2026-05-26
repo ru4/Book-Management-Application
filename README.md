@@ -52,7 +52,7 @@ Each book is stored as a dictionary:
 ## Requirements
 
 - Python 3.x
-- No external libraries needed (uses only standard library: `json`, `csv`, `os`)
+- No external libraries needed (uses only standard library: `json`, `csv`)
     
 ## Menu Options
 

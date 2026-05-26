@@ -25,8 +25,6 @@ Version: 1.0
 
 import json
 import csv
-import os
-
 
 #=========================
 # CONSTANTS
@@ -121,7 +119,6 @@ def load_books():
     Returns: 
         list: A list of books loaded from the JSON file
     """
-
 
     try:
         with open(BOOKS_JSON_FILE, "r") as file:
