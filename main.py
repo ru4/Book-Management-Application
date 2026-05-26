@@ -121,9 +121,7 @@ def load_books():
     Returns: 
         list: A list of books loaded from the JSON file
     """
-   
-    if not os.path.exists(BOOKS_JSON_FILE) or os.path.getsize(BOOKS_JSON_FILE) == 0:
-        return []
+
 
     try:
         with open(BOOKS_JSON_FILE, "r") as file:
@@ -131,6 +129,9 @@ def load_books():
         return books
     except json.JSONDecodeError:
         print(f"\nCouldn't load {BOOKS_JSON_FILE}! Starting with an empty collection.")
+        return []
+    except FileNotFoundError:
+        print(f"\n{BOOKS_JSON_FILE} not found! Starting with an empty collection.")
         return []
     
         
