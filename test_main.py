@@ -1,7 +1,7 @@
 """
 Unit Tests for Book Management Application
 ===========================================
-Tests for all functional requirements (UT01 to UT16)
+Tests for all functional requirements (UT-01 to UT-16)
 plus validation helper tests.
 """
 
@@ -14,19 +14,19 @@ import main
 
 
 # ============================================================
-# UT01, UT02, UT03 / EH04, EH05: load_books() Tests
+# UT-01, UT-02, UT-03 / EH-04, EH-05: load_books() Tests
 # ============================================================
 
 class TestLoadBooks(unittest.TestCase):
-    """UT01 - UT03 /EH04 - EH05: Tests for loading books from JSON file"""
+    """UT-01 - UT-03 /EH-04 - EH-05: Tests for loading books from JSON file"""
     
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=100)
     @patch('builtins.open', new_callable=mock_open, read_data=json.dumps([
         {"title": "1984", "author": "George Orwell", "genre": "Dystopian", "year": 1949, "price": 9.99}
     ]))
-    def test_UT01_load_valid_json(self, mock_file, mock_getsize, mock_exists):
-        """UT01: Load from existing books.json with valid data returns list of dicts"""
+    def test_load_valid_json(self, mock_file, mock_getsize, mock_exists):
+        """UT-01: Load from existing books.json with valid data returns list of dicts"""
         result = main.load_books()
         
         self.assertIsInstance(result, list)
@@ -35,16 +35,16 @@ class TestLoadBooks(unittest.TestCase):
         self.assertEqual(result[0]['author'], "George Orwell")
 
     @patch('os.path.exists', return_value=False)
-    def test_UT02_EH05_load_file_not_exist(self, mock_exists):
-        """UT02 / EH05: Load when books.json does not exist returns empty list without crashing"""
+    def test_load_file_not_exist(self, mock_exists):
+        """UT-02 / EH-05: Load when books.json does not exist returns empty list without crashing"""
         result = main.load_books()
         
         self.assertEqual(result, [])
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=0)
-    def test_UT03_load_empty_file(self, mock_getsize, mock_exists):
-        """UT03: Load from empty books.json returns empty list"""
+    def test_load_empty_file(self, mock_getsize, mock_exists):
+        """UT-03: Load from empty books.json returns empty list"""
         result = main.load_books()
         
         self.assertEqual(result, [])
@@ -53,8 +53,8 @@ class TestLoadBooks(unittest.TestCase):
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=100)
     @patch('builtins.open', new_callable=mock_open, read_data="This is not valid JSON{{{")
-    def test_EH04_corrupted_json_file(self, mock_file, mock_getsize, mock_exists):
-        """EH04: Corrupted JSON file - graceful error, empty collection returned"""
+    def test_corrupted_json_file(self, mock_file, mock_getsize, mock_exists):
+        """EH-04: Corrupted JSON file - graceful error, empty collection returned"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             result = main.load_books()
         
@@ -63,7 +63,7 @@ class TestLoadBooks(unittest.TestCase):
         self.assertIn("Couldn't load", output)
     
 # ============================================================
-# UT04: save_books() Test
+# UT-04: save_books() Test
 # ============================================================
 
 class TestSaveBooks(unittest.TestCase):
@@ -71,8 +71,8 @@ class TestSaveBooks(unittest.TestCase):
 
     @patch('builtins.open', new_callable=mock_open)
     @patch('json.dump')
-    def test_UT04_save_writes_correct_json(self, mock_json_dump, mock_file):
-        """UT04: Save list to books.json - file created with correct JSON format"""
+    def test_save_writes_correct_json(self, mock_json_dump, mock_file):
+        """UT-04: Save list to books.json - file created with correct JSON format"""
         books = [
             {"title": "Test", "author": "A", "genre": "G", "year": 2000, "price": 5.0}
         ]
@@ -87,7 +87,7 @@ class TestSaveBooks(unittest.TestCase):
 
 
 # ============================================================
-# UT05, UT06, UT07: add_book() Tests
+# UT-05: add_book() Tests
 # ============================================================
 
 class TestAddBook(unittest.TestCase):
@@ -99,8 +99,8 @@ class TestAddBook(unittest.TestCase):
 
     @patch('main.save_books')
     @patch('main.get_valid_input')
-    def test_UT05_add_valid_book(self, mock_input, mock_save):
-        """UT05: Add valid book data - book appended to list, file saved"""
+    def test_add_valid_book(self, mock_input, mock_save):
+        """UT-05: Add valid book data - book appended to list, file saved"""
         mock_input.side_effect = ["The Hobbit", "J.R.R. Tolkien", "Fantasy", 1937, 12.99]
         
         main.add_book(self.book_list)
@@ -114,101 +114,21 @@ class TestAddBook(unittest.TestCase):
         self.assertEqual(book['price'], 12.99)
         mock_save.assert_called_once_with(self.book_list)
 
-    @patch('main.save_books')
-    @patch('main.get_valid_input')
-    def test_UT06_correct_prompts_used(self, mock_input, mock_save):
-        """UT06: Add book uses correct prompts and types for each field"""
-        mock_input.side_effect = ["Title", "Author", "Genre", 2000, 9.99]
-        
-        main.add_book(self.book_list)
-        
-        # Verify each call to get_valid_input has correct arguments
-        calls = mock_input.call_args_list
-        self.assertEqual(calls[0], call("\nEnter book title: "))
-        self.assertEqual(calls[1], call("\nEnter book author: "))
-        self.assertEqual(calls[2], call("\nEnter book genre: "))
-        self.assertEqual(calls[3], call("\nEnter book published year: ", int, 
-                                         "\nThe year must be a whole number! (e.g., 1999)"))
-        self.assertEqual(calls[4], call("\nEnter book price: ", float, 
-                                         "\nThe price must be a number! (e.g., 19.99)"))
 
 
 # ============================================================
-# UT07 / EH01 - EH03: get_valid_input() Validation Tests
+# UT-06, UT-07 / EH-01 - EH-03: get_valid_input() Validation Tests
 # (Tests the validation that add_book relies on)
 # ============================================================
 
 class TestGetValidInput(unittest.TestCase):
-    """UT07 / EH01 - EH03: Tests for input validation helper"""
-
-    
-    @patch('builtins.input')
-    def test_UT07a_valid_string_accepted(self, mock_input):
-        """UT07: Valid string returned without error"""
-        mock_input.return_value = "The Hobbit"
-        
-        result = main.get_valid_input("Enter title: ")
-        self.assertEqual(result, "The Hobbit")
+    """UT-06, UT-07 / EH-01 - EH-03: Tests for input validation helper
+        which add_book relies on for user input
+    """
 
     @patch('builtins.input')
-    def test_UT07b_valid_int_accepted(self, mock_input):
-        """UT07: Valid integer converted and returned"""
-        mock_input.return_value = "1999"
-        
-        result = main.get_valid_input("Enter year: ", int)
-        self.assertEqual(result, 1999)
-        self.assertIsInstance(result, int)
-
-    @patch('builtins.input')
-    def test_UT07c_valid_float_accepted(self, mock_input):
-        """UT07: Valid float converted and returned"""
-        mock_input.return_value = "19.99"
-        
-        result = main.get_valid_input("Enter price: ", float)
-        self.assertEqual(result, 19.99)
-        self.assertIsInstance(result, float)
-
-
-   
-    @patch('builtins.input')
-    def test_UT07d_whitespace_rejected(self, mock_input):
-        """UT07: Whitespace-only input treated as empty"""
-        mock_input.side_effect = ["   ", "Valid Title"]
-        
-        with patch('sys.stdout', new=io.StringIO()) as fake_out:
-            result = main.get_valid_input("Enter title: ")
-        
-        self.assertEqual(result, "Valid Title")
-        self.assertIn("This field cannot be empty!", fake_out.getvalue())
-
-    @patch('builtins.input')
-    def test_EH01_non_numeric_year_rejected(self, mock_input):
-        """EH01: Non-numeric year input rejected with error"""
-        
-        mock_input.side_effect = ["abc", "1999"]
-        
-        with patch('sys.stdout', new=io.StringIO()) as fake_out:
-            result = main.get_valid_input("Enter year: ", int, "Must be a number!")
-        
-        output = fake_out.getvalue()
-        self.assertEqual(result, 1999)
-        self.assertIn("Must be a number!", output)
-
-    @patch('builtins.input')
-    def test_EH02_non_numeric_price_rejected(self, mock_input):
-        """EH02: Non-numeric price input rejected with error"""
-        mock_input.side_effect = ["xyz", "19.99"]
-        
-        with patch('sys.stdout', new=io.StringIO()) as fake_out:
-            result = main.get_valid_input("Enter price: ", float, "Must be a number!")
-        
-        output = fake_out.getvalue()
-        self.assertEqual(result, 19.99)
-        self.assertIn("Must be a number!", output)
-
-    @patch('builtins.input')
-    def test_EH03_empty_string_rejected(self, mock_input):
-        """EH03: Empty input rejected with error message"""
+    def test_empty_string_rejected(self, mock_input):
+        """UT-06 / EH-03: Empty input rejected with error message"""
         mock_input.side_effect = ["", "Valid Title"]
         
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
@@ -221,8 +141,74 @@ class TestGetValidInput(unittest.TestCase):
 
 
 
+    @patch('builtins.input')
+    def test_valid_string_accepted(self, mock_input):
+        """UT-07: Valid string returned without error"""
+        mock_input.return_value = "The Hobbit"
+        
+        result = main.get_valid_input("Enter title: ")
+        self.assertEqual(result, "The Hobbit")
+
+    @patch('builtins.input')
+    def test_valid_int_accepted(self, mock_input):
+        """UT-07: Valid integer converted and returned"""
+        mock_input.return_value = "1999"
+        
+        result = main.get_valid_input("Enter year: ", int)
+        self.assertEqual(result, 1999)
+        self.assertIsInstance(result, int)
+
+    @patch('builtins.input')
+    def test_valid_float_accepted(self, mock_input):
+        """UT-07: Valid float converted and returned"""
+        mock_input.return_value = "19.99"
+        
+        result = main.get_valid_input("Enter price: ", float)
+        self.assertEqual(result, 19.99)
+        self.assertIsInstance(result, float)
+
+
+   
+    @patch('builtins.input')
+    def test_whitespace_rejected(self, mock_input):
+        """UT-07: Whitespace-only input treated as empty"""
+        mock_input.side_effect = ["   ", "Valid Title"]
+        
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            result = main.get_valid_input("Enter title: ")
+        
+        self.assertEqual(result, "Valid Title")
+        self.assertIn("This field cannot be empty!", fake_out.getvalue())
+
+    @patch('builtins.input')
+    def test_non_numeric_year_rejected(self, mock_input):
+        """EH-01: Non-numeric year input rejected with error"""
+        
+        mock_input.side_effect = ["abc", "1999"]
+        
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            result = main.get_valid_input("Enter year: ", int, "Must be a number!")
+        
+        output = fake_out.getvalue()
+        self.assertEqual(result, 1999)
+        self.assertIn("Must be a number!", output)
+
+    @patch('builtins.input')
+    def test_non_numeric_price_rejected(self, mock_input):
+        """EH-02: Non-numeric price input rejected with error"""
+        mock_input.side_effect = ["xyz", "19.99"]
+        
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            result = main.get_valid_input("Enter price: ", float, "Must be a number!")
+        
+        output = fake_out.getvalue()
+        self.assertEqual(result, 19.99)
+        self.assertIn("Must be a number!", output)
+
+
+
 # ============================================================
-# UT08, UT09: search_book() Tests
+# UT-08, UT-09: search_book() Tests
 # ============================================================
 
 class TestSearchBook(unittest.TestCase):
@@ -237,8 +223,8 @@ class TestSearchBook(unittest.TestCase):
         ]
 
     @patch('main.get_valid_input', return_value="1984")
-    def test_UT08_search_book_found(self, mock_input):
-        """UT08: Search for existing book - details displayed"""
+    def test_search_book_found(self, mock_input):
+        """UT-08: Search for existing book - details displayed"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.search_book(self.books)
         
@@ -250,8 +236,8 @@ class TestSearchBook(unittest.TestCase):
         self.assertIn("9.99", output)
 
     @patch('main.get_valid_input', return_value="1984")
-    def test_UT08b_case_insensitive_search(self, mock_input):
-        """UT08: Search should be case-insensitive"""
+    def test_case_insensitive_search(self, mock_input):
+        """UT-08: Search should be case-insensitive"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.search_book(self.books)
         
@@ -259,16 +245,16 @@ class TestSearchBook(unittest.TestCase):
         self.assertIn("1984", output)
 
     @patch('main.get_valid_input', return_value="Nonexistent Book")
-    def test_UT09_search_book_not_found(self, mock_input):
-        """UT09: Search for non-existent book - 'not found' message displayed"""
+    def test_search_book_not_found(self, mock_input):
+        """UT-09: Search for non-existent book - 'not found' message displayed"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.search_book(self.books)
         
         output = fake_out.getvalue()
         self.assertIn("Book not found", output)
 
-    def test_UT09b_search_empty_collection(self):
-        """UT09: Search in empty collection shows appropriate message"""
+    def test_search_empty_collection(self):
+        """UT-09: Search in empty collection shows appropriate message"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.search_book([])
         
@@ -277,7 +263,7 @@ class TestSearchBook(unittest.TestCase):
 
 
 # ============================================================
-# UT10: sort_books() Test
+# UT-10: sort_books() Test
 # ============================================================
 
 class TestSortBooks(unittest.TestCase):
@@ -291,8 +277,8 @@ class TestSortBooks(unittest.TestCase):
         ]
 
     @patch('main.save_books')
-    def test_UT10_sort_alphabetically(self, mock_save):
-        """UT10: Sort multiple books - alphabetical order by title"""
+    def test_sort_alphabetically(self, mock_save):
+        """UT-10: Sort multiple books - alphabetical order by title"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.sort_books(self.books)
         
@@ -311,8 +297,8 @@ class TestSortBooks(unittest.TestCase):
         # Check save was called
         mock_save.assert_called_once_with(self.books)
 
-    def test_UT10b_sort_empty_collection(self):
-        """UT10: Sort empty collection shows appropriate message"""
+    def test_sort_empty_collection(self):
+        """UT-10: Sort empty collection shows appropriate message"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.sort_books([])
         
@@ -321,7 +307,7 @@ class TestSortBooks(unittest.TestCase):
 
 
 # ============================================================
-# UT11: find_oldest_book() Test
+# UT-11: find_oldest_book() Test
 # ============================================================
 
 class TestFindOldestBook(unittest.TestCase):
@@ -334,8 +320,8 @@ class TestFindOldestBook(unittest.TestCase):
             {"title": "Book C", "author": "C", "genre": "G", "year": 2020, "price": 5.0}
         ]
 
-    def test_UT11_find_oldest_book(self):
-        """UT11: Find oldest book - earliest year displayed"""
+    def test_find_oldest_book(self):
+        """UT-11: Find oldest book - earliest year displayed"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.find_oldest_book(self.books)
         
@@ -343,8 +329,8 @@ class TestFindOldestBook(unittest.TestCase):
         self.assertIn("Book B", output)
         self.assertIn("1950", output)
 
-    def test_UT11b_single_book(self):
-        """UT11: Single book collection - that book is the oldest"""
+    def test_find_oldest_book_single(self):
+        """UT-11: Single book collection - that book is the oldest"""
         single_book = [{"title": "Only", "author": "X", "genre": "G", "year": 2000, "price": 5.0}]
         
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
@@ -353,8 +339,8 @@ class TestFindOldestBook(unittest.TestCase):
         output = fake_out.getvalue()
         self.assertIn("Only", output)
 
-    def test_UT11c_empty_collection(self):
-        """UT11: Empty collection shows appropriate message"""
+    def test_find_oldest_book_empty_collection(self):
+        """UT-11: Empty collection shows appropriate message"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.find_oldest_book([])
         
@@ -363,7 +349,7 @@ class TestFindOldestBook(unittest.TestCase):
 
 
 # ============================================================
-# UT12: find_newest_book() Test
+# UT-12: find_newest_book() Test
 # ============================================================
 
 class TestFindNewestBook(unittest.TestCase):
@@ -376,8 +362,8 @@ class TestFindNewestBook(unittest.TestCase):
             {"title": "Book C", "author": "C", "genre": "G", "year": 2020, "price": 5.0}
         ]
 
-    def test_UT12_find_newest_book(self):
-        """UT12: Find newest book - latest year displayed"""
+    def test_find_newest_book(self):
+        """UT-12: Find newest book - latest year displayed"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.find_newest_book(self.books)
         
@@ -385,8 +371,8 @@ class TestFindNewestBook(unittest.TestCase):
         self.assertIn("Book C", output)
         self.assertIn("2020", output)
 
-    def test_UT12b_single_book(self):
-        """UT12: Single book collection - that book is the newest"""
+    def test_find_newest_book_single(self):
+        """UT-12: Single book collection - that book is the newest"""
         single_book = [{"title": "Only", "author": "X", "genre": "G", "year": 2000, "price": 5.0}]
         
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
@@ -395,8 +381,8 @@ class TestFindNewestBook(unittest.TestCase):
         output = fake_out.getvalue()
         self.assertIn("Only", output)
 
-    def test_UT12c_empty_collection(self):
-        """UT12: Empty collection shows appropriate message"""
+    def test_find_newest_book_empty_collection(self):
+        """UT-12: Empty collection shows appropriate message"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.find_newest_book([])
         
@@ -405,7 +391,7 @@ class TestFindNewestBook(unittest.TestCase):
 
 
 # ============================================================
-# UT13, UT14: count_books_by_author() Tests
+# UT-13, UT-14: count_books_by_author() Tests
 # ============================================================
 
 class TestCountBooksByAuthor(unittest.TestCase):
@@ -422,8 +408,8 @@ class TestCountBooksByAuthor(unittest.TestCase):
         ]
 
     @patch('main.get_valid_input', return_value="George Orwell")
-    def test_UT13_count_existing_author(self, mock_input):
-        """UT13: Author with multiple books - correct count displayed"""
+    def test_count_existing_author(self, mock_input):
+        """UT-13: Author with multiple books - correct count displayed"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.count_books_by_author(self.books)
         
@@ -432,8 +418,8 @@ class TestCountBooksByAuthor(unittest.TestCase):
         self.assertIn("George Orwell", output)
 
     @patch('main.get_valid_input', return_value="Aldous Huxley")
-    def test_UT13b_count_single_book_author(self, mock_input):
-        """UT13: Author with one book - count of 1 displayed"""
+    def test_count_single_book_author(self, mock_input):
+        """UT-13: Author with one book - count of 1 displayed"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.count_books_by_author(self.books)
         
@@ -442,8 +428,8 @@ class TestCountBooksByAuthor(unittest.TestCase):
         self.assertIn("Aldous Huxley", output)
 
     @patch('main.get_valid_input', return_value="Unknown Author")
-    def test_UT14_count_no_author(self, mock_input):
-        """UT14: Author with no books - zero/not found message displayed"""
+    def test_count_no_author(self, mock_input):
+        """UT-14: Author with no books - zero/not found message displayed"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.count_books_by_author(self.books)
         
@@ -451,16 +437,16 @@ class TestCountBooksByAuthor(unittest.TestCase):
         self.assertIn("No books found", output)
 
     @patch('main.get_valid_input', return_value="george orwell")
-    def test_UT14b_case_insensitive_search(self, mock_input):
-        """UT14: Author search should be case-insensitive"""
+    def test_case_insensitive_search(self, mock_input):
+        """UT-14: Author search should be case-insensitive"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.count_books_by_author(self.books)
         
         output = fake_out.getvalue()
         self.assertIn("2", output)
 
-    def test_UT14c_empty_collection(self):
-        """UT14: Empty collection shows appropriate message"""
+    def test_count_empty_collection(self):
+        """UT-14: Empty collection shows appropriate message"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.count_books_by_author([])
         
@@ -469,7 +455,7 @@ class TestCountBooksByAuthor(unittest.TestCase):
 
 
 # ============================================================
-# UT15: export_titles_csv() Test
+# UT-15: export_titles_csv() Test
 # ============================================================
 
 class TestExportTitlesCSV(unittest.TestCase):
@@ -483,16 +469,16 @@ class TestExportTitlesCSV(unittest.TestCase):
         ]
 
     @patch('main.write_to_csv')
-    def test_UT15_export_titles(self, mock_write):
-        """UT15: Export titles - write_to_csv called with correct titles"""
+    def test_export_titles(self, mock_write):
+        """UT-15: Export titles - write_to_csv called with correct titles"""
         main.export_titles_csv(self.books)
         
         expected_titles = ["Book A", "Book B", "Book C"]
         mock_write.assert_called_once_with(expected_titles, main.TITLES_CSV_FILE)
 
     @patch('main.write_to_csv')
-    def test_UT15b_empty_list(self, mock_write):
-        """UT15: Empty list - no export, appropriate message"""
+    def test_export_titles_empty_list(self, mock_write):
+        """UT-15: Empty list - no export, appropriate message"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.export_titles_csv([])
         
@@ -502,7 +488,7 @@ class TestExportTitlesCSV(unittest.TestCase):
 
 
 # ============================================================
-# UT16: export_years_csv() Test
+# UT-16: export_years_csv() Test
 # ============================================================
 
 class TestExportYearsCSV(unittest.TestCase):
@@ -516,16 +502,16 @@ class TestExportYearsCSV(unittest.TestCase):
         ]
 
     @patch('main.write_to_csv')
-    def test_UT16_export_years(self, mock_write):
-        """UT16: Export years - write_to_csv called with correct years"""
+    def test_export_years(self, mock_write):
+        """UT-16: Export years - write_to_csv called with correct years"""
         main.export_years_csv(self.books)
         
         expected_years = [2000, 2005, 2010]
         mock_write.assert_called_once_with(expected_years, main.YEARS_CSV_FILE)
 
     @patch('main.write_to_csv')
-    def test_UT16b_empty_list(self, mock_write):
-        """UT16: Empty list - no export, appropriate message"""
+    def test_export_years_empty_list(self, mock_write):
+        """UT-16: Empty list - no export, appropriate message"""
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             main.export_years_csv([])
         

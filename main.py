@@ -309,7 +309,7 @@ def export_titles_csv(book_list):
     titles = [book["title"] for book in book_list]
 
     write_to_csv(titles, TITLES_CSV_FILE)
-    print("\nBook titles exported to titles.csv successfully!")
+    print(f"\nBook titles exported to {TITLES_CSV_FILE} successfully!")
 
 def export_years_csv(book_list):
     """
@@ -327,7 +327,7 @@ def export_years_csv(book_list):
     years = [book["year"] for book in book_list]
     
     write_to_csv(years, YEARS_CSV_FILE)
-    print("\nPublication years exported to years.csv successfully!")
+    print(f"\nPublication years exported to {YEARS_CSV_FILE} successfully!")
 
 def count_books_by_author(book_list):
     """

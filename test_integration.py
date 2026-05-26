@@ -50,7 +50,7 @@ class TestIntegration(unittest.TestCase):
         
     
     @patch('main.get_valid_input')
-    def test_IT_01_add_then_search(self, mock_input):
+    def test_add_then_search(self, mock_input):
         """IT-01: Add a book, then search for it - book found and displayed"""
         # Simulate adding a book
         mock_input.side_effect = [
@@ -78,7 +78,7 @@ class TestIntegration(unittest.TestCase):
         
     
     @patch('main.get_valid_input')
-    def test_IT_02_add_then_sort(self, mock_input):
+    def test_add_then_sort(self, mock_input):
         """IT-02: Add multiple books, then sort - correct alphabetical order"""
         # Add three books in non-alphabetical order
         books_data = [
@@ -114,7 +114,7 @@ class TestIntegration(unittest.TestCase):
 
     
     @patch('main.get_valid_input')
-    def test_IT_03_add_then_export(self, mock_input):
+    def test_add_then_export(self, mock_input):
         """IT-03: Add books, then export - CSV files contain correct data"""
         # Add two books
         books_data = [
@@ -141,7 +141,7 @@ class TestIntegration(unittest.TestCase):
         
         
     @patch('main.get_valid_input')
-    def test_IT_04_data_persistence(self, mock_input):
+    def test_data_persistence(self, mock_input):
         """IT-04: Add books, save, reload - data persists correctly"""
         mock_input.side_effect = [
             "The Hobbit", "Tolkien", "Fantasy", 1937, 12.99
@@ -156,7 +156,7 @@ class TestIntegration(unittest.TestCase):
         
     
     @patch('main.get_valid_input')
-    def test_IT_05_full_workflow(self, mock_input):
+    def test_full_workflow(self, mock_input):
         """IT-05: Full workflow - add, search, sort, oldest, newest, export, count"""
        
         # Add three books
