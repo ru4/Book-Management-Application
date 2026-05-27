@@ -35,8 +35,16 @@ class TestLoadBooks(unittest.TestCase):
     @patch('builtins.open', side_effect=FileNotFoundError)
     def test_load_file_not_exist(self, mock_open):
         """UT-02 / EH-05: Load when books.json does not exist returns empty list without crashing"""
-        result = main.load_books()
+        
+        
+        with patch('sys.stdout', new=io.StringIO()) as fake_out:
+            result = main.load_books()
+        
+        output = fake_out.getvalue()
+        
         self.assertEqual(result, [])
+        self.assertIn("not found", output)
+
 
 
 
